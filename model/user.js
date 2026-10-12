@@ -1,33 +1,102 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true
+        required: true,
+        minlength: 2
     },
     lastName: { 
         type: String,
-        required: true
+        minlength: 2
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true,
+        trim:true,
+        minlength: 5,
+        validate: (value) => {
+            if(!validator.isEmail(value)) {
+                throw new Error(`${value} is not a valid email`);
+            }
+        }
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        minlength: 8,
+            validate: (value) => {
+            if(!validator.isStrongPassword(value)) {
+                throw new Error(`${value} is not a valid password`);
+            }
+        },
     },  
     age:{
         type: Number,
-        required: true
+        min:18
+
+    },
+    gender:{
+        type: String,
+        enum: ['Male', 'Female', 'Other'],
+        // validate: {
+        //     validator: function(v) {
+        //         return ['Male', 'Female', 'Other'].includes(v);
+        //     },
+        //     message: props => `${props.value} is not a valid gender`
+        // }
+        validate:(value) => {
+            if(!['Male', 'Female', 'Other'].includes(value)){
+                throw new Error(`${value} is not a valid gender`);
+            }
+        }
     },
 
     phoneNumber:{
-        type: Number
-    }
+        type: Number,
+        minlength: 10
+    },
+    about:{
+        type: String,
+        default:"This about the User"
+    },
+    skill:{
+        type: [String],
+    },
+    profileUrl:{
+        type: String,
+        default: "https://www.flaticon.com/free-icon/profile_3135715.png",
+          validate: (value) => {
+            if(!validator.isURL(value)) {
+                throw new Error(`${value} is not a valid URL`);
+            }
+        }
+    },
+}, {
+    timestamps: true
 });
 
-const User = mongoose.model('User', userSchema);
+// const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+userSchema.methods.getJWT = function() {
+    const user = this;
+    const token = jwt.sign({_id: user._id}, 'DEV@Tinder@790', { expiresIn: '1d' });
+    return token;
+};
+
+userSchema.methods.validatePassword = async function(passwordInputByUser) {
+    const user = this;
+    const passwordHash = user.password;
+    const isPasswordValid = await bcrypt.compare(passwordInputByUser, passwordHash);
+    
+    if(!isPasswordValid) {
+        throw new Error(`Invalid password`);
+    }
+};
+
+
+module.exports = mongoose.model('User', userSchema);
