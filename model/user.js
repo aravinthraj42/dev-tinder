@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -16,6 +17,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+        index: true,
         lowercase: true,
         trim:true,
         minlength: 5,
@@ -42,18 +44,21 @@ const userSchema = new mongoose.Schema({
     },
     gender:{
         type: String,
-        enum: ['Male', 'Female', 'Other'],
+        enum: {
+            values: ['Male', 'Female', 'Other'],
+            message: '{VALUE} is not a valid gender'
+        },
         // validate: {
         //     validator: function(v) {
         //         return ['Male', 'Female', 'Other'].includes(v);
         //     },
         //     message: props => `${props.value} is not a valid gender`
         // }
-        validate:(value) => {
-            if(!['Male', 'Female', 'Other'].includes(value)){
-                throw new Error(`${value} is not a valid gender`);
-            }
-        }
+        // validate:(value) => {
+        //     if(!['Male', 'Female', 'Other'].includes(value)){
+        //         throw new Error(`${value} is not a valid gender`);
+        //     }
+        // }
     },
 
     phoneNumber:{
@@ -96,6 +101,8 @@ userSchema.methods.validatePassword = async function(passwordInputByUser) {
     if(!isPasswordValid) {
         throw new Error(`Invalid password`);
     }
+
+    return isPasswordValid;
 };
 
 

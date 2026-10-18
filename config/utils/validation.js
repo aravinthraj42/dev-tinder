@@ -26,4 +26,21 @@ const validateUser = (req) => {
     }
 }
 
-module.exports = validateUser;
+const validateEditUserDetails = (req) =>{
+
+    const allEditFields = ["firstName", "lastName", "gender", "about", "age", "phoneNumber", "profilePicture" , "skill"];
+
+    const isValid = Object.keys(req.body).every(field => allEditFields.includes(field));
+  
+
+    if(!isValid) {
+        throw new Error('Invalid fields in request body');
+    }
+
+    return isValid;
+}
+
+module.exports = {
+    validateUser,
+    validateEditUserDetails
+};
