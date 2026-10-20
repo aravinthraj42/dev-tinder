@@ -28,7 +28,7 @@ const validateUser = (req) => {
 
 const validateEditUserDetails = (req) =>{
 
-    const allEditFields = ["firstName", "lastName", "gender", "about", "age", "phoneNumber", "profilePicture" , "skill"];
+    const allEditFields = ["firstName", "lastName", "gender", "about", "age", "phoneNumber", "profileUrl" , "skill"];
 
     const isValid = Object.keys(req.body).every(field => allEditFields.includes(field));
   

@@ -105,10 +105,10 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 
 
 
-profileRouter.get("/profile/edit", userAuth, async (req, res) => {
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
     try{
-        validateEditUserDetails(req)
+        // validateEditUserDetails(req)
         if(!validateEditUserDetails(req)) {
             throw new Error('Invalid edit fields');
         }
