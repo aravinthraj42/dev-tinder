@@ -4,6 +4,9 @@ const User = require('../model/user');
 const userAuth = async (req, res, next) =>{
 
     const {token} = req.cookies;
+    if(!token){
+        return res.status(401).send('Unauthorized, Please Login');
+    }
 
     const decodedObj = jwt.verify(token, "DEV@Tinder@790");
 
