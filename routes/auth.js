@@ -87,7 +87,13 @@ authRouter.post("/forgotPassword", async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).send('User not found');
+            return res.status(404).json({ 
+                message: 'User not found', 
+                status: 404, 
+                timestamp: new Date(), 
+                requestId: req.id || null, 
+                method: req.method || null
+             }    );
         }
         // Logic to send password reset email or token goes here
         console.log(`Password reset requested for email: ${email}`);
