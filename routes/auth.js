@@ -9,6 +9,9 @@ const authRouter = express.Router();
 
 
 authRouter.post('/register', async (req, res) => {
+    try{
+
+
 
     //Validate User
     validateUser(req);
@@ -30,9 +33,21 @@ authRouter.post('/register', async (req, res) => {
         gender,
         phoneNumber
     });
-    user.save()
-        .then(() => res.status(201).send('User registered successfully'))
-        .catch((err) => res.status(400).send(err));
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+    res.cookie('token', token, { expires: new Date(Date.now() + 8* 3600000),path: '/' });
+        res.json({ 
+            message: 'User registered successfully', 
+            status: 201, 
+            timestamp: new Date(), 
+            requestId: req.id || null, 
+            method: req.method || null,
+            token: token,
+            user: savedUser 
+        });
+    } catch(err) {
+        res.status(400).json({ message: err.message, status: 400, timestamp: new Date(), requestId: req.id || null, method: req.method || null });
+    }                
 });
 
 // router.post("/login", async (req,res)=>{
